@@ -5,7 +5,7 @@ import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, u
 import { Send, Mic, MicOff, Sparkles, Globe, ChevronRight, BookOpen, User as UserIcon, Bot, MessageSquare, Plus, Settings, X, Paperclip, Image as ImageIcon, Home as HomeIcon, History, Copy, Check, ShieldAlert, Timer, Instagram, Ghost, Share2, Beaker } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import ReactMarkdown from "react-markdown";
-import { generateAIResponse, generateTestAI } from "../lib/gemini";
+import { generateAIResponse, generateTestAI, generateChatTitle } from "../lib/gemini";
 import { cn, safeDispatchChatSelected } from "../lib/utils";
 import SettingsModal from "../components/SettingsModal";
 
@@ -162,9 +162,10 @@ export default function Home({ theme, toggleTheme, language, changeLanguage, hid
     // Create new chat if none active
     if (!chatId) {
       try {
+        const generatedTitle = await generateChatTitle(messageText);
         const chatRef = await addDoc(collection(db, "chats"), {
           userId: user.uid,
-          title: messageText.slice(0, 30) + (messageText.length > 30 ? "..." : "") || "Image Analysis",
+          title: generatedTitle,
           isHidden: false,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
@@ -200,8 +201,9 @@ export default function Home({ theme, toggleTheme, language, changeLanguage, hid
       await addDoc(collection(db, "chats", chatId, "messages"), userMessage);
       
       if (messages.length === 0) {
+        const generatedTitle = await generateChatTitle(messageText);
         await updateDoc(doc(db, "chats", chatId), {
-          title: messageText.slice(0, 30) + (messageText.length > 30 ? "..." : "") || "Image Analysis",
+          title: generatedTitle,
           updatedAt: serverTimestamp(),
         });
       } else {

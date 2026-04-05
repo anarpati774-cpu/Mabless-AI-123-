@@ -114,3 +114,24 @@ export async function generateTestAI(context: string) {
     return [];
   }
 }
+
+export async function generateChatTitle(firstMessage: string) {
+  const systemInstruction = `You are a helpful assistant that generates short, descriptive, and accurate titles for chat conversations based on the first message. 
+  The title should be concise (max 5-6 words) and capture the essence of the user's request.
+  Return ONLY the title string, no quotes or extra text.`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: CHAT_MODEL,
+      contents: `First Message: ${firstMessage}`,
+      config: {
+        systemInstruction,
+      },
+    });
+
+    return response.text?.trim() || firstMessage.slice(0, 30) + (firstMessage.length > 30 ? "..." : "");
+  } catch (e) {
+    console.error("Failed to generate chat title:", e);
+    return firstMessage.slice(0, 30) + (firstMessage.length > 30 ? "..." : "");
+  }
+}
