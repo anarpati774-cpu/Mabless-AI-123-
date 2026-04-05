@@ -1,0 +1,5 @@
+{
+  "name": "Mabless AI",
+  "description": "A smart AI-powered chatbot that provides direct answers, website suggestions, and study aids.",
+  "requestFramePermissions": ["microphone"]
+}
